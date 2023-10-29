@@ -1,0 +1,7 @@
+CREATE DATABASE noter;
+
+
+CREATE TABLE notes(
+    noteId SERIAL PRIMARY KEY,
+    text VARCHAR(255)
+);
