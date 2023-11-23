@@ -30,7 +30,10 @@ function SharedWithMe() {
     <div className="h-screen flex items-center justify-start flex-col pt-4  bg-sky-800">
       <div className="w-3/4 h-full flex flex-col overflow-y-scroll no-scrollbar p-4">
         {data.length === 0 && (
-          <p className=" text-center text-sky-100 pt-48">No Notes Yet!</p>
+          <p className=" text-center text-sky-100 pt-48">
+            If another user shares edit access to a note with you, it will
+            appear here!
+          </p>
         )}
         {data.map((note) => {
           return (

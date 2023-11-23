@@ -120,12 +120,12 @@ function Note() {
     getUsers
   );
   useEffect(() => {
-    if (data && data[0] && data[0].text) setText(data[0].text);
+    if (data && data && data.text) setText(data.text);
   }, [data]);
 
   return (
     <div className="h-screen flex items-center justify-start flex-col pt-10 bg-sky-800">
-      {!isLoading && data[0] && (
+      {!isLoading && data && (
         <div className="flex flex-col h-1/2 w-3/4">
           <textarea
             className="h-full border rounded-xl p-2"
@@ -148,7 +148,7 @@ function Note() {
               {updated ? "Success!" : "Update Note!"}
             </p>
           </div>
-          {username === data[0].username && (
+          {username === data.username && (
             <div
               onClick={() => {
                 deleteNote();
@@ -158,7 +158,7 @@ function Note() {
               <p className={`text-red-800`}>Delete Note</p>
             </div>
           )}
-          {username === data[0].username && (
+          {username === data.username && (
             <div
               onClick={() => {
                 setShowUsers(true);
@@ -201,13 +201,17 @@ function Note() {
                     className="w-full bg-sky-100 rounded-xl py-2 pl-2 items-center flex flex-row mb-2 text-sm text-sky-900 justify-between pr-2"
                   >
                     <div className="text-sky-900">{user.username}</div>
-                    {sharedUsers
-                      ?.map((user) => {
-                        return user.sharedwithname;
-                      })
-                      .includes(user.username) && (
-                      <div className="text-sky-800">
+
+                    {sharedUsers?.includes(user.username) ? (
+                      <div className="text-sky-800 flex flex-row">
+                        <p className="text-xs pt-1 pr-2">Shared!</p>{" "}
                         <CheckBoxIcon />
+                      </div>
+                    ) : (
+                      <div className="h-6 w-6">
+                        <p className="text-xs pt-1 mr-2">
+                          {username === user.username && "(me)"}
+                        </p>
                       </div>
                     )}
                   </button>
