@@ -1,5 +1,4 @@
 CREATE DATABASE noter;
-/* create a table users which has a username as the primary key and password*/
 
 CREATE TABLE users(
     username VARCHAR(255) PRIMARY KEY,
@@ -30,3 +29,41 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER trigger_delete_note
 BEFORE DELETE ON notes
     FOR EACH ROW EXECUTE PROCEDURE delete_notes();
+
+/*create a procedure to delete a note*/
+CREATE PROCEDURE delete_note(id integer)
+LANGUAGE SQL
+AS $$
+DELETE FROM notes WHERE noteId = id;
+$$;
+
+
+/*create a procedure to update a note*/
+CREATE PROCEDURE update_note(id integer, new varchar(255))
+LANGUAGE SQL
+AS $$
+UPDATE notes SET text = new WHERE noteId = id;
+$$;
+
+/* procedure to create a new note */
+CREATE PROCEDURE create_new_note (text varchar(255), username varchar(255))
+LANGUAGE SQL
+AS $$
+INSERT INTO notes (text, username) VALUES(text, username) RETURNING *
+$$;
+
+/* procedure for creating a new user */
+CREATE PROCEDURE create_new_user (username varchar(255), password varchar(255))
+LANGUAGE SQL
+AS $$
+INSERT INTO users (username, password) VALUES(username, password) RETURNING *
+$$;
+
+
+
+/* procedure for sharing a note */
+CREATE PROCEDURE share_note (noteId integer, authorName varchar(255), sharedWithName varchar(255))
+LANGUAGE SQL
+AS $$
+INSERT INTO sharedNotes (noteId, authorName, sharedWithName) VALUES(noteId, authorName, sharedWithName) RETURNING *
+$$;

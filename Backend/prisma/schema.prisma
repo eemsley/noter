@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model notes {
+  noteid      Int           @id @default(autoincrement())
+  text        String?       @db.VarChar(255)
+  createdat   DateTime?     @default(now()) @db.Timestamptz(6)
+  username    String?       @db.VarChar(255)
+  users       users?        @relation(fields: [username], references: [username], onDelete: NoAction, onUpdate: NoAction)
+  sharednotes sharednotes[]
+}
+
+model sharednotes {
+  sharedid                                Int     @id @default(autoincrement())
+  authorname                              String? @db.VarChar(255)
+  sharedwithname                          String? @db.VarChar(255)
+  noteid                                  Int?
+  users_sharednotes_authornameTousers     users?  @relation("sharednotes_authornameTousers", fields: [authorname], references: [username], onDelete: NoAction, onUpdate: NoAction)
+  notes                                   notes?  @relation(fields: [noteid], references: [noteid], onDelete: NoAction, onUpdate: NoAction)
+  users_sharednotes_sharedwithnameTousers users?  @relation("sharednotes_sharedwithnameTousers", fields: [sharedwithname], references: [username], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model users {
+  username                                      String        @id @db.VarChar(255)
+  password                                      String?       @db.VarChar(255)
+  notes                                         notes[]
+  sharednotes_sharednotes_authornameTousers     sharednotes[] @relation("sharednotes_authornameTousers")
+  sharednotes_sharednotes_sharedwithnameTousers sharednotes[] @relation("sharednotes_sharedwithnameTousers")
+}
