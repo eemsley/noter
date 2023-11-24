@@ -114,18 +114,18 @@ function Note() {
     const res = await fetch(`http://localhost:5000/users`);
     return res.json();
   };
-  const { data, isLoading } = useQuery("note", getNote);
+  const { data: note, isLoading: isNoteLoading } = useQuery("note", getNote);
   const { data: users, isLoading: isUsersLoading } = useQuery(
     "users",
     getUsers
   );
   useEffect(() => {
-    if (data && data && data.text) setText(data.text);
-  }, [data]);
+    if (note) setText(note.text);
+  }, [note, isNoteLoading]);
 
   return (
     <div className="h-screen flex items-center justify-start flex-col pt-10 bg-sky-800">
-      {!isLoading && data && (
+      {!isNoteLoading && note && (
         <div className="flex flex-col h-1/2 w-3/4">
           <textarea
             className="h-full border rounded-xl p-2"
@@ -148,7 +148,7 @@ function Note() {
               {updated ? "Success!" : "Update Note!"}
             </p>
           </div>
-          {username === data.username && (
+          {username === note.username && (
             <div
               onClick={() => {
                 deleteNote();
@@ -158,7 +158,7 @@ function Note() {
               <p className={`text-red-800`}>Delete Note</p>
             </div>
           )}
-          {username === data.username && (
+          {username === note.username && (
             <div
               onClick={() => {
                 setShowUsers(true);

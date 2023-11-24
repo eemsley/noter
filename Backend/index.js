@@ -25,6 +25,7 @@ app.get("/users/:username/sharedNotes", async (req, res) => {
     const notes = await prisma.notes.findMany({
       where: { noteid: { in: noteIds } },
     });
+    console.log("GET SHARED NOTES: " + username);
     res.json(notes);
   } catch (err) {
     console.error(err.message);
@@ -39,6 +40,7 @@ app.get("/notes/:id/sharedWith", async (req, res) => {
     const notes = await prisma.sharednotes.findMany({
       where: { noteid: parseInt(id) },
     });
+    console.log("GET SHARED WITH: " + id);
     res.json(notes.map((n) => n.sharedwithname));
   } catch (err) {
     console.error(err.message);
@@ -72,6 +74,7 @@ app.post("/notes/:id/share", async (req, res) => {
           authorname: authorName,
         },
       });
+      console.log("UNSHARE: " + id + ", " + sharedWithName);
       res.json("Note " + id + " Unshared!");
       return;
     } else {
@@ -81,6 +84,7 @@ app.post("/notes/:id/share", async (req, res) => {
         authorName,
         sharedWithName,
       ]);
+      console.log("SHARE: " + id + ", " + sharedWithName);
       res.json("Note " + id + " Shared!");
     }
   } catch (err) {
@@ -93,6 +97,7 @@ app.get("/users", async (req, res) => {
   try {
     //ORM
     const allUsers = await prisma.users.findMany();
+    console.log("GET ALL USERS");
     res.json(allUsers);
   } catch (err) {
     console.error(err.message);
@@ -108,6 +113,7 @@ app.post("/users", async (req, res) => {
       username,
       password,
     ]);
+    console.log("CREATE USER: " + username);
     res.json({ user: { username, password }, taken: false });
   } catch (err) {
     res.json({ user: null, taken: true });
@@ -127,11 +133,14 @@ app.post("/users/login", async (req, res) => {
       where: { username: username, password: password },
     });
     if (user) {
+      console.log("LOGIN: " + username);
       res.json({ user: user, loggedIn: true, userExists: true });
     } else {
       if (userExists) {
+        console.log("INCORRECT PASSWORD: " + username);
         res.json({ user: null, loggedIn: false, userExists: true });
       } else {
+        console.log("USER NOT FOUND: " + username);
         res.json({ user: null, loggedIn: false, userExists: false });
       }
     }
@@ -148,17 +157,48 @@ app.get("/notes/search/:searchText", async (req, res) => {
     const notes = await prisma.notes.findMany({
       where: { text: { contains: searchText } },
     });
+    console.log("SEARCH TEXT: " + searchText);
+    res.json(notes);
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+//search all notes (1 ORM)
+app.get("/notes/searchUsers/:searchText", async (req, res) => {
+  try {
+    const { searchText } = req.params;
+    //ORM
+    const notes = await prisma.notes.findMany({
+      where: { username: { contains: searchText } },
+    });
+    console.log("SEARCH USERS: " + searchText);
     res.json(notes);
   } catch (err) {
     console.error(err.message);
   }
 });
 
-//get all notes (1 ORM)
-app.get("/notes", async (req, res) => {
+//get all notes (4 ORM)
+app.get("/notes/all/:orderBy", async (req, res) => {
   try {
     //ORM
-    const allNotes = await prisma.notes.findMany();
+    const { orderBy } = req.params;
+    let allNotes;
+    if (orderBy === "oldest")
+      allNotes = await prisma.notes.findMany({
+        orderBy: { createdat: "asc" },
+      });
+    else if (orderBy === "user")
+      allNotes = await prisma.notes.findMany({
+        orderBy: { username: "asc" },
+      });
+    else if (orderBy === "text")
+      allNotes = await prisma.notes.findMany({ orderBy: { text: "asc" } });
+    else
+      allNotes = await prisma.notes.findMany({
+        orderBy: { createdat: "desc" },
+      });
+    console.log("GET ALL NOTES: " + orderBy);
     res.json(allNotes);
   } catch (err) {
     console.error(err.message);
@@ -170,9 +210,10 @@ app.get("/notes/:id", async (req, res) => {
   try {
     const { id } = req.params;
     //ORM
-    const note = await prisma.notes.findUnique({
+    const note = await prisma.notes.findFirst({
       where: { noteid: parseInt(id) },
     });
+    console.log("GET NOTE: " + id);
     res.json(note);
   } catch (err) {
     console.error(err.message);
@@ -187,6 +228,7 @@ app.get("/users/:username/notes", async (req, res) => {
     const notes = await prisma.notes.findMany({
       where: { username: username },
     });
+    console.log("GET NOTES:" + username);
     res.json(notes);
   } catch (err) {
     console.error(err.message);
@@ -202,6 +244,7 @@ app.post("/notes", async (req, res) => {
       text,
       username,
     ]);
+    console.log("CREATE:" + text + ", " + username);
     res.json("Note Created!");
   } catch (err) {
     console.error(err.message);
@@ -218,6 +261,7 @@ app.put("/notes/:id", async (req, res) => {
       id,
       text,
     ]);
+    console.log("UPDATE:" + id + ", " + text);
     res.json("Note " + id + " Updated!");
   } catch (err) {
     console.error(err.message);
@@ -230,6 +274,7 @@ app.delete("/notes/:id", async (req, res) => {
     const { id } = req.params;
     //SP
     const deleteNote = pool.query("CALL delete_note($1);", [id]);
+    console.log("DELETE:" + id);
     res.json("Note " + id + " Deleted!");
   } catch (err) {
     console.error(err.message);
