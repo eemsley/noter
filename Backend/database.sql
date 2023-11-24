@@ -67,3 +67,8 @@ LANGUAGE SQL
 AS $$
 INSERT INTO sharedNotes (noteId, authorName, sharedWithName) VALUES(noteId, authorName, sharedWithName) RETURNING *
 $$;
+
+
+CREATE INDEX text_index ON notes(text);
+CREATE INDEX username_index ON notes(username);
+CREATE INDEX createdat_index ON notes(createdat);
