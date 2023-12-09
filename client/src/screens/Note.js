@@ -124,7 +124,7 @@ function Note() {
   }, [note, isNoteLoading]);
 
   return (
-    <div className="h-screen flex items-center justify-start flex-col pt-10 bg-sky-800">
+    <div className="h-screen flex items-center justify-start flex-col pt-10 bg-primary-800">
       {!isNoteLoading && note && (
         <div className="flex flex-col h-1/2 w-3/4">
           <textarea
@@ -141,10 +141,14 @@ function Note() {
               else editNote();
             }}
             className={`flex flex-row w-full justify-center items-center rounded-lg mt-4 ${
-              text === "" ? "bg-slate-200" : "bg-sky-100"
+              text === "" ? "bg-slate-200" : "bg-primary-100"
             }`}
           >
-            <p className={`${text === "" ? "text-slate-400" : "text-sky-800"}`}>
+            <p
+              className={`${
+                text === "" ? "text-slate-400" : "text-primary-800"
+              }`}
+            >
               {updated ? "Success!" : "Update Note!"}
             </p>
           </div>
@@ -171,19 +175,19 @@ function Note() {
         </div>
       )}
       {showUsers && (
-        <div className="bg-sky-200/90 w-[50%] h-[50%] absolute rounded-xl flex flex-col justify-center items-center">
+        <div className="bg-primary-200/90 w-[50%] h-[50%] absolute rounded-xl flex flex-col justify-center items-center">
           <div className="h-[15%] w-full flex flex-row items-center justify-between px-4">
-            <p className="text-sky-800 text-xl text-center">Share Note</p>
+            <p className="text-primary-800 text-xl text-center">Share Note</p>
             <input
               onChange={(e) => {
                 setSearchText(e.target.value);
               }}
-              className="text-sky-800 text-sm text-left px-2 rounded-full justify-center items-center mt-1 mr-10"
+              className="text-primary-800 text-sm text-left px-2 rounded-full justify-center items-center mt-1 mr-10"
               placeholder="Search"
             />
             <button
               onClick={() => setShowUsers(false)}
-              className="text-xs text-sky-900 bg-sky-100 h-6 w-6 rounded-full justify-center items-center text-center"
+              className="text-xs text-primary-900 bg-primary-100 h-6 w-6 rounded-full justify-center items-center text-center"
             >
               x
             </button>
@@ -198,12 +202,12 @@ function Note() {
                     onClick={() => {
                       shareNote(user.username);
                     }}
-                    className="w-full bg-sky-100 rounded-xl py-2 pl-2 items-center flex flex-row mb-2 text-sm text-sky-900 justify-between pr-2"
+                    className="w-full bg-primary-100 rounded-xl py-2 pl-2 items-center flex flex-row mb-2 text-sm text-primary-900 justify-between pr-2"
                   >
-                    <div className="text-sky-900">{user.username}</div>
+                    <div className="text-primary-900">{user.username}</div>
 
                     {sharedUsers?.includes(user.username) ? (
-                      <div className="text-sky-800 flex flex-row">
+                      <div className="text-primary-800 flex flex-row">
                         <p className="text-xs pt-1 pr-2">Shared!</p>{" "}
                         <CheckBoxIcon />
                       </div>

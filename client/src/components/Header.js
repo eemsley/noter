@@ -10,11 +10,32 @@ function Header() {
   return (
     location.pathname !== "/login" &&
     location.pathname !== "/createAccount" && (
-      <div className="w-full flex flex-row justify-evenly px-4 pt-4 border-b border-white pb-2">
+      <div className="w-full flex flex-row justify-evenly px-4 pt-4 bg-primary-400 pb-2">
+        <h1 className="text-4xl text-primary-50">Noter</h1>
+
+        {username !== "guest" ? (
+          <Link to={"/report"}>
+            <div
+              className={`p-1 ${
+                location.pathname === "/report"
+                  ? "bg-primary-50"
+                  : "bg-primary-200"
+              } rounded-lg mt-3`}
+            >
+              <p className="text-primary-900">Report</p>
+            </div>
+          </Link>
+        ) : (
+          <div></div>
+        )}
         {username !== "guest" ? (
           <Link to={"/"}>
-            <div className="p-1 bg-sky-100 rounded-lg mt-3">
-              <p className="text-sky-900">All Notes</p>
+            <div
+              className={`p-1 ${
+                location.pathname === "/" ? "bg-primary-50" : "bg-primary-200"
+              } rounded-lg mt-3`}
+            >
+              <p className="text-primary-900">All Notes</p>
             </div>
           </Link>
         ) : (
@@ -22,26 +43,43 @@ function Header() {
         )}
         {username !== "guest" && (
           <Link to={"/MyNotes"}>
-            <div className="p-1 bg-sky-100 rounded-lg mt-3">
-              <p className="text-sky-900">My Notes</p>
+            <div
+              className={`p-1 rounded-lg mt-3 ${
+                location.pathname === "/MyNotes"
+                  ? "bg-primary-50"
+                  : "bg-primary-200"
+              }`}
+            >
+              <p className="text-primary-900">My Notes</p>
             </div>
           </Link>
         )}
-        <h1 className="text-4xl text-sky-800">Noter</h1>
         {username !== "guest" && (
           <Link to={"/create"}>
-            <div className="p-1 bg-sky-100 rounded-lg mt-3">
-              <p className="text-sky-900">+ New Note </p>
+            <div
+              className={`p-1 rounded-lg mt-3 ${
+                location.pathname === "/create"
+                  ? "bg-primary-50"
+                  : "bg-primary-200"
+              }`}
+            >
+              <p className="text-primary-900">+ New Note </p>
             </div>
           </Link>
         )}
         <Link to={username === "guest" ? "/login" : "/account"}>
           {username === "guest" ? (
-            <div className="p-1 bg-sky-100 rounded-lg mt-3 text-sky-900">
+            <div className="p-1 bg-primary-50 rounded-lg mt-3 text-primary-900">
               Login!
             </div>
           ) : (
-            <div className="bg-sky-100 text-sky-800 h-10 w-10 rounded-full flex  justify-center items-center mt-2">
+            <div
+              className={` h-8 w-8 justify-center items-center flex rounded-full mt-3 ${
+                location.pathname === "/account"
+                  ? "bg-primary-50"
+                  : "bg-primary-200"
+              }`}
+            >
               <p className="">{username[0].toString().toUpperCase()}</p>
             </div>
           )}

@@ -17,14 +17,22 @@ CREATE TABLE sharedNotes(
     sharedWithName VARCHAR(255) REFERENCES users(username),
     noteId INTEGER REFERENCES notes(noteId)
 );
+/* create a table for a like on a note from a user */
+CREATE TABLE likes(
+    likeId SERIAL PRIMARY KEY,
+    username VARCHAR(255) REFERENCES users(username),
+    noteId INTEGER REFERENCES notes(noteId)
+);
 
 /* create a trigger to delete any sharedNotes when a note is deleted from the notes table*/
 CREATE OR REPLACE FUNCTION delete_notes() RETURNS TRIGGER AS $$
     BEGIN                 
-        DELETE FROM sharedNotes WHERE noteId = OLD.noteId;                    
+        DELETE FROM sharedNotes WHERE noteId = OLD.noteId; 
+        DELETE FROM likes WHERE noteId = OLD.noteId;                   
         RETURN OLD;
     END;
 $$ LANGUAGE plpgsql;
+
 
 CREATE TRIGGER trigger_delete_note
 BEFORE DELETE ON notes
@@ -67,6 +75,14 @@ LANGUAGE SQL
 AS $$
 INSERT INTO sharedNotes (noteId, authorName, sharedWithName) VALUES(noteId, authorName, sharedWithName) RETURNING *
 $$;
+
+/* procedure for liking a note */
+CREATE PROCEDURE like_note (noteId integer, username varchar(255))
+LANGUAGE SQL
+AS $$
+INSERT INTO likes (noteId, username) VALUES(noteId, username) RETURNING *
+$$;
+
 
 
 CREATE INDEX text_index ON notes(text);

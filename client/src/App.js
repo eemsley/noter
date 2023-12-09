@@ -10,6 +10,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import MyNotes from "./screens/MyNotes";
 import Account from "./screens/Account";
 import SharedWithMe from "./screens/SharedWithMe";
+import Report from "./screens/Report";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ function App() {
           <Route path="/myNotes" element={<MyNotes />} />
           <Route path="/createAccount" element={<CreateAccount />} />
           <Route path="/sharedWithMe" element={<SharedWithMe />} />
+          <Route path="/report" element={<Report />} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>

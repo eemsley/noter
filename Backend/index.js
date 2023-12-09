@@ -92,6 +92,36 @@ app.post("/notes/:id/share", async (req, res) => {
   }
 });
 
+// like a note (2 ORM, 1 SP)
+app.post("/notes/:id/like", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { username } = req.body;
+    //ORM
+    const alreadyLiked = await prisma.likes.findFirst({
+      where: { noteid: parseInt(id), username: username },
+    });
+    if (alreadyLiked) {
+      //SP
+      const unlikeNote = await prisma.likes.deleteMany({
+        where: { noteid: parseInt(id), username: username },
+      });
+      console.log("UNLIKE: " + id + ", " + username);
+      res.json("Note " + id + " Unliked!");
+    } else {
+      //SP
+      const likeNote = await pool.query("CALL like_note($1, $2);", [
+        id,
+        username,
+      ]);
+      console.log("LIKE: " + id + ", " + username);
+      res.json("Note " + id + " Liked!");
+    }
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
 //get all users (1 ORM)
 app.get("/users", async (req, res) => {
   try {
@@ -99,6 +129,55 @@ app.get("/users", async (req, res) => {
     const allUsers = await prisma.users.findMany();
     console.log("GET ALL USERS");
     res.json(allUsers);
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+//get all users (1 ORM)
+app.get("/usersreport/:user/:time", async (req, res) => {
+  try {
+    //ORM
+    const { user, time } = req.params;
+    const oldestAllowedTime = new Date();
+    if (time === "24_Hours") {
+      oldestAllowedTime.setDate(oldestAllowedTime.getDate() - 1);
+    } else if (time === "1_Hour") {
+      oldestAllowedTime.setHours(oldestAllowedTime.getHours() - 1);
+    } else if (time === "Last_Week") {
+      oldestAllowedTime.setDate(oldestAllowedTime.getDate() - 7);
+    } else {
+      oldestAllowedTime.setFullYear(0);
+    }
+    const target = await prisma.users.findFirst({
+      where: { username: user },
+      include: {
+        notes: {
+          where: { createdat: { gte: oldestAllowedTime } },
+          include: {
+            likes: true,
+          },
+        },
+      },
+    });
+    console.log("GET USER REPORT");
+    res.json(target);
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+/* get all users (3 ORM) */
+app.get("/report", async (req, res) => {
+  try {
+    //ORM
+    const allUsers = await prisma.users.findMany();
+    const allNotes = await prisma.notes.findMany();
+    const allLikes = await prisma.likes.findMany();
+    console.log("GET USER REPORT");
+    res.json({
+      users: allUsers.length,
+      notes: allNotes.length,
+      likes: allLikes.length,
+    });
   } catch (err) {
     console.error(err.message);
   }
@@ -156,6 +235,13 @@ app.get("/notes/search/:searchText", async (req, res) => {
     //ORM
     const notes = await prisma.notes.findMany({
       where: { text: { contains: searchText } },
+      orderBy: { createdat: "asc" },
+      include: {
+        //unqil
+        likes: {
+          select: { username: true },
+        },
+      },
     });
     console.log("SEARCH TEXT: " + searchText);
     res.json(notes);
@@ -170,6 +256,13 @@ app.get("/notes/searchUsers/:searchText", async (req, res) => {
     //ORM
     const notes = await prisma.notes.findMany({
       where: { username: { contains: searchText } },
+      orderBy: { createdat: "asc" },
+      include: {
+        //unqil
+        likes: {
+          select: { username: true },
+        },
+      },
     });
     console.log("SEARCH USERS: " + searchText);
     res.json(notes);
@@ -185,18 +278,30 @@ app.get("/notes/all/:orderBy", async (req, res) => {
     const { orderBy } = req.params;
     let allNotes;
     if (orderBy === "oldest")
+      //include the usernames of those who liked it
       allNotes = await prisma.notes.findMany({
         orderBy: { createdat: "asc" },
+        include: {
+          //unqil
+          likes: {
+            select: { username: true },
+          },
+        },
       });
     else if (orderBy === "user")
       allNotes = await prisma.notes.findMany({
         orderBy: { username: "asc" },
+        include: { likes: true },
       });
     else if (orderBy === "text")
-      allNotes = await prisma.notes.findMany({ orderBy: { text: "asc" } });
+      allNotes = await prisma.notes.findMany({
+        orderBy: { text: "asc" },
+        include: { likes: true },
+      });
     else
       allNotes = await prisma.notes.findMany({
         orderBy: { createdat: "desc" },
+        include: { likes: true },
       });
     console.log("GET ALL NOTES: " + orderBy);
     res.json(allNotes);

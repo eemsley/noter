@@ -20,35 +20,35 @@ function MyNotes() {
   if (error) return <div>Request Failed</div>;
   if (isLoading)
     return (
-      <div className=" h-screen flex flex-col w-full  items-center pt-48 bg-sky-800">
-        <Dots color={"white"} />
+      <div className=" h-screen flex flex-col w-full  items-center pt-48 bg-white">
+        <Dots color={"gray"} />
       </div>
     );
   return (
-    <div className="h-screen flex items-center justify-start flex-col pt-4  bg-sky-800">
+    <div className="h-screen flex items-center justify-start flex-col pt-4  bg-white">
       <div className="w-3/4 h-full flex flex-col overflow-y-scroll no-scrollbar p-4">
         {data.length === 0 && (
-          <p className=" text-center text-sky-100 pt-48">
+          <p className=" text-center text-primary-800 pt-48">
             Create a note to view it here!
           </p>
         )}
         {data.map((note) => {
           return (
             <div
-              className="flex flex-col h-24 border-b border-white w-full rounded-lg bg-sky-100 shadow-2xl shadow-sky-100/30 p-2 my-2 "
+              className="flex flex-col h-24 border-b w-full rounded-lg bg-primary-200 shadow-lg p-2 my-4"
               onClick={() => {
                 navigate(`/note/${note.noteid}`);
               }}
             >
               <div className="w-full  h-5/6 flex flex-row">
-                <p className=" text-sky-900">{note.text}</p>
+                <p className=" text-primary-900">{note.text}</p>
               </div>
               <div className="w-full h-1/6 justify-end items-end">
-                <p className=" text-sky-800 text-right text-xs">
+                <p className=" text-primary-800 text-right text-xs">
                   {moment(note.createdat).fromNow()} by{" "}
                   {note.username === username ? "me" : note.username}
                 </p>
-                <p className=" text-sky-800 text-right text-xs"></p>
+                <p className=" text-primary-800 text-right text-xs"></p>
               </div>
             </div>
           );

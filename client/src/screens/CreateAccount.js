@@ -44,9 +44,9 @@ function CreateAccount() {
   };
 
   return (
-    <div className="h-screen flex items-center justify-start flex-col pt-4  bg-sky-800">
+    <div className="h-screen flex items-center justify-start flex-col pt-4  bg-primary-400">
       <div className="w-3/4 h-full flex flex-col overflow-y-scroll no-scrollbar p-4 space-y-2">
-        <h1 className="text-xl text-sky-100 pb-6">Create an Account</h1>
+        <h1 className="text-xl text-primary-100 pb-6">Create an Account</h1>
         <input
           className="h-12 border rounded-xl p-2"
           type="text"
@@ -82,7 +82,7 @@ function CreateAccount() {
         )}
         {!taken && match && <p className="text-transparent text-xs">...</p>}
         <button
-          className="h-12 border rounded-xl p-2 bg-sky-100 "
+          className="h-12 border rounded-xl p-2 bg-primary-100 "
           onClick={() => {
             if (confirm !== password) {
               setMatch(false);
@@ -99,7 +99,7 @@ function CreateAccount() {
             navigate("/login");
           }}
         >
-          <p className="text-center text-xs pt-10 text-sky-100">
+          <p className="text-center text-xs pt-10 text-primary-100">
             {"Back to login"}
           </p>
         </div>

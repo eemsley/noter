@@ -12,8 +12,13 @@ model notes {
   text        String?       @db.VarChar(255)
   createdat   DateTime?     @default(now()) @db.Timestamptz(6)
   username    String?       @db.VarChar(255)
+  likes       likes[]
   users       users?        @relation(fields: [username], references: [username], onDelete: NoAction, onUpdate: NoAction)
   sharednotes sharednotes[]
+
+  @@index([createdat], map: "createdat_index")
+  @@index([text], map: "text_index")
+  @@index([username], map: "username_index")
 }
 
 model sharednotes {
@@ -29,7 +34,16 @@ model sharednotes {
 model users {
   username                                      String        @id @db.VarChar(255)
   password                                      String?       @db.VarChar(255)
+  likes                                         likes[]
   notes                                         notes[]
   sharednotes_sharednotes_authornameTousers     sharednotes[] @relation("sharednotes_authornameTousers")
   sharednotes_sharednotes_sharedwithnameTousers sharednotes[] @relation("sharednotes_sharedwithnameTousers")
+}
+
+model likes {
+  likeid   Int     @id @default(autoincrement())
+  username String? @db.VarChar(255)
+  noteid   Int?
+  notes    notes?  @relation(fields: [noteid], references: [noteid], onDelete: NoAction, onUpdate: NoAction)
+  users    users?  @relation(fields: [username], references: [username], onDelete: NoAction, onUpdate: NoAction)
 }
